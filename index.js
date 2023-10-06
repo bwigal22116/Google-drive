@@ -8,7 +8,8 @@ dotenv.config();
 const __dirname = process.cwd();
 const server = http.createServer();
 const app = express(server);
-const bareServer = createBareServer("/bare/");
+const bareServer = createBareServer("/outerspace/");
+const PORT = process.env.PORT
 
 app.use(express.json());
 app.use(
@@ -19,51 +20,29 @@ app.use(
 
 app.use(express.static(path.join(__dirname, "static")));
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "index.html"));
-});
+const routes = [
+  { path: "/", file: "index.html" },
+  { path: "/news", file: "apps.html" },
+  { path: "/algebra", file: "games.html" },
+  { path: "/settings", file: "settings.html" },
+  { path: "/tabs", file: "tabs.html" },
+  { path: "/tabinner", file: "tabinner.html" },
+  { path: "/go", file: "go.html" },
+  { path: "/loading", file: "loading.html" },
+  { path: "/404", file: "404.html" },
+];
 
-app.get("/web", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "web.html"));
-});
-
-app.get("/play", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "play.html"));
-});
-
-app.get("/apps", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "apps.html"));
-});
-
-app.get("/math", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "math.html"));
-});
-
-app.get("/chat", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "chat.html"));
-});
-
-app.get("/go", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "go.html"));
-});
-
-app.get("/settings", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "settings.html"));
-});
-
-app.get("/donate", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "donate.html"));
-});
-
-app.get("/404", (req, res) => {
-  res.sendFile(path.join(__dirname, "static", "404.html"));
+routes.forEach((route) => {
+  app.get(route.path, (req, res) => {
+    res.sendFile(path.join(__dirname, "static", route.file));
+  });
 });
 
 app.get("/*", (req, res) => {
   res.redirect("/404");
 });
 
-// Bare Server
+// Bare Server 
 server.on("request", (req, res) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeRequest(req, res);
@@ -85,6 +64,6 @@ server.on("listening", () => {
 });
 
 server.listen({
-  port: process.env.PORT,
+  port: PORT,
 });
 
